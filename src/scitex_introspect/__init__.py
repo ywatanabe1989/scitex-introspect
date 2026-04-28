@@ -4,8 +4,15 @@
 
 """scitex-introspect — IPython-style introspection for any Python package (standalone).
 
-__version__ = "0.1.0"
-
+try:
+    from importlib.metadata import version as _v, PackageNotFoundError
+    try:
+        __version__ = _v("scitex-introspect")
+    except PackageNotFoundError:
+        __version__ = "0.0.0+local"
+    del _v, PackageNotFoundError
+except ImportError:  # pragma: no cover — only on ancient Pythons
+    __version__ = "0.0.0+local"
 Introspection utilities for Python packages.
 
 Provides IPython-like introspection capabilities for any Python package.
