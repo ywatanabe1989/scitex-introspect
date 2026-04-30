@@ -39,6 +39,8 @@ Advanced Introspection:
 - get_function_calls: Simple outgoing calls list
 """
 
+from __future__ import annotations
+
 from ._core import (  # IPython-style names; Basic; Advanced - Call graph; Advanced - Type hints; Advanced - Class hierarchy; Advanced - Imports
     dir,
     find_examples,
@@ -60,6 +62,7 @@ from ._core import (  # IPython-style names; Basic; Advanced - Call graph; Advan
 from ._list_api import list_api
 
 __all__ = [
+    "__version__",
     # IPython-style names
     "q",
     "qq",
