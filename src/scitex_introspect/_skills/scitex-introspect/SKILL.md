@@ -62,5 +62,3 @@ ix.get_type_hints(func)      # PEP-563-resolved hints
   for its `list-python-apis` subcommand
 - `scitex-skills` — converts introspection output into agent-readable
   skill leaves
-
-<!-- EOF -->
