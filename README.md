@@ -43,7 +43,7 @@ ix.dir(my_pkg)       # List attributes/methods
 
 ## 2 Interfaces
 
-<details>
+<details open>
 <summary><strong>Python API</strong></summary>
 
 <br>
