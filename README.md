@@ -10,24 +10,50 @@
 [![License: AGPL v3](https://img.shields.io/badge/license-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 <!-- scitex-badges:end -->
 
+<p align="center">
+  <a href="https://scitex.ai">
+    <img src="docs/scitex-logo-blue-cropped.png" alt="SciTeX" width="400">
+  </a>
+</p>
 
-IPython-style introspection for any Python package, extracted from the [SciTeX](https://github.com/ywatanabe1989/scitex-python) ecosystem as a standalone, zero-dep package.
+<p align="center"><b>IPython-style introspection for any Python package — `q`, `qq`, `dir`, signatures, source.</b></p>
 
-## Install
+<p align="center">
+  <a href="https://scitex-introspect.readthedocs.io/">Full Documentation</a> · <code>pip install scitex-introspect</code>
+</p>
+
+---
+
+## Installation
 
 ```bash
 pip install scitex-introspect
 pip install "scitex-introspect[mcp]"   # + MCP server for AI agents
 ```
 
-## API
+## Quick Start
+
+```python
+import scitex_introspect as ix
+
+ix.q(my_func)        # Signature with type hints (like `my_func?`)
+ix.qq(my_func)       # Full source code (like `my_func??`)
+ix.dir(my_pkg)       # List attributes/methods
+```
+
+## 2 Interfaces
+
+<details>
+<summary><strong>Python API</strong></summary>
+
+<br>
 
 ```python
 import scitex_introspect as ix
 
 # IPython-style shortcuts
-ix.q(my_func)        # Signature with type hints (like `my_func?`)
-ix.qq(my_func)       # Full source code (like `my_func??`)
+ix.q(my_func)        # Signature with type hints
+ix.qq(my_func)       # Full source code
 ix.dir(my_pkg)       # List attributes/methods
 ix.list_api(my_pkg)  # Recursive module API tree
 
@@ -38,19 +64,52 @@ ix.source(my_func)
 ix.members(my_pkg)
 
 # Static analysis
-ix.imports(file_path)        # Imports of a Python file
-ix.call_graph(my_func)       # What functions does this call?
-ix.class_hierarchy(MyClass)  # MRO + base classes
-ix.examples(my_func)         # Doctest / docstring examples
-ix.resolve("scitex.io.save") # Walk dotted path → object
+ix.imports(file_path)
+ix.call_graph(my_func)
+ix.class_hierarchy(MyClass)
+ix.examples(my_func)
+ix.resolve("scitex.io.save")
 ```
+
+</details>
+
+<details>
+<summary><strong>MCP Server — for AI Agents</strong></summary>
+
+<br>
+
+Install with `pip install "scitex-introspect[mcp]"` and the package
+exposes async handlers for IPython-style introspection over MCP — agents
+can ask "what's the signature of X?" or "show me the source of Y" without
+running Python themselves.
+
+</details>
 
 ## Status
 
-Standalone fork of `scitex.introspect`. Pure stdlib — zero deps. The umbrella
-package's `scitex.introspect` import path is preserved via a `sys.modules`-alias
-bridge. 76/77 tests pass (1 skipped).
+Standalone fork of `scitex.introspect`. Pure stdlib core — zero runtime
+deps. The umbrella package's `scitex.introspect` import path is preserved
+via a `sys.modules`-alias bridge.
+
+## Part of SciTeX
+
+`scitex-introspect` is part of [**SciTeX**](https://scitex.ai).
+
+>Four Freedoms for Research
+>
+>0. The freedom to **run** your research anywhere — your machine, your terms.
+>1. The freedom to **study** how every step works — from raw data to final manuscript.
+>2. The freedom to **redistribute** your workflows, not just your papers.
+>3. The freedom to **modify** any module and share improvements with the community.
+>
+>AGPL-3.0 — because we believe research infrastructure deserves the same freedoms as the software it runs on.
 
 ## License
 
 AGPL-3.0-only (see [LICENSE](./LICENSE)).
+
+---
+
+<p align="center">
+  <a href="https://scitex.ai" target="_blank"><img src="docs/scitex-icon-navy-inverted.png" alt="SciTeX" width="40"/></a>
+</p>
