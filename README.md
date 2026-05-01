@@ -93,7 +93,9 @@ via a `sys.modules`-alias bridge.
 
 ## Part of SciTeX
 
-`scitex-introspect` is part of [**SciTeX**](https://scitex.ai).
+`scitex-introspect` is part of [**SciTeX**](https://scitex.ai). Install via
+the umbrella with `pip install scitex[introspect]` to use as
+`scitex.introspect` (Python) or `scitex introspect ...` (CLI).
 
 >Four Freedoms for Research
 >
