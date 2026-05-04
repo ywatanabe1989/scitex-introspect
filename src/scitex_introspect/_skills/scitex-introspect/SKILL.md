@@ -62,3 +62,10 @@ ix.get_type_hints(func)      # PEP-563-resolved hints
   for its `list-python-apis` subcommand
 - `scitex-skills` — converts introspection output into agent-readable
   skill leaves
+
+## Sub-skills
+
+### Core (01–09)
+- [01_installation.md](01_installation.md) — install + import sanity check
+- [02_quick-start.md](02_quick-start.md) — 30-second tour
+- [03_python-api.md](03_python-api.md) — Python API surface
