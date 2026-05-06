@@ -19,7 +19,6 @@ classifiers = [
 ]
 dependencies = [
     "pandas",
-    "scitex",
 ]
 
 [project.optional-dependencies]
