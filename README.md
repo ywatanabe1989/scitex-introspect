@@ -33,15 +33,28 @@ pip install scitex-introspect
 pip install "scitex-introspect[mcp]"   # + MCP server for AI agents
 ```
 
-## Quick Start
+## Architecture
 
-```python
-import scitex_introspect as ix
-
-ix.q(my_func)        # Signature with type hints (like `my_func?`)
-ix.qq(my_func)       # Full source code (like `my_func??`)
-ix.dir(my_pkg)       # List attributes/methods
 ```
+scitex_introspect/
+├── _core.py              ← q / qq IPython-style entrypoints
+├── _signature.py         ← inspect.signature with type hints
+├── _docstring.py         ← docstring extraction
+├── _source.py            ← getsource with fallback
+├── _list_api.py          ← recursive module API tree
+├── _members.py           ← attribute / method enumeration
+├── _imports.py           ← static import-graph extraction
+├── _call_graph.py        ← AST-based caller / callee analysis
+├── _class_hierarchy.py   ← MRO + base-class walk
+├── _examples.py          ← scrape doctest / examples blocks
+├── _resolve.py           ← dotted-path → object resolver
+├── _type_hints.py        ← typing.get_type_hints helpers
+├── _mcp/                 ← MCP server tools
+└── _skills/              ← agent-facing skill pages
+```
+
+Pure-stdlib core — every module is a thin layer over `inspect`,
+`importlib`, `ast`, and `typing`. Zero runtime deps.
 
 ## 2 Interfaces
 
@@ -86,6 +99,35 @@ can ask "what's the signature of X?" or "show me the source of Y" without
 running Python themselves.
 
 </details>
+
+## Demo
+
+```mermaid
+flowchart LR
+    A["scitex_introspect.q(obj)"] --> B[".signature + type hints"]
+    A2["scitex_introspect.qq(obj)"] --> C[".source"]
+    A3["scitex_introspect.dir(pkg)"] --> D[".members + .list_api"]
+    A4["scitex_introspect.resolve('a.b.c')"] --> E["dotted-path lookup"]
+    B & C & D & E --> F["agent / REPL output"]
+```
+
+```python
+>>> import scitex_introspect as ix, json
+>>> ix.q(json.loads)
+json.loads(s, *, cls=None, object_hook=None, ...)
+>>> ix.dir(json)[:3]
+['JSONDecodeError', 'JSONDecoder', 'JSONEncoder']
+```
+
+## Quick Start
+
+```python
+import scitex_introspect as ix
+
+ix.q(my_func)        # Signature with type hints (like `my_func?`)
+ix.qq(my_func)       # Full source code (like `my_func??`)
+ix.dir(my_pkg)       # List attributes/methods
+```
 
 ## Status
 
