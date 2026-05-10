@@ -9,7 +9,7 @@
 <p align="center"><b>IPython-style introspection for any Python package — `q`, `qq`, `dir`, signatures, source.</b></p>
 
 <p align="center">
-  <a href="https://scitex-introspect.readthedocs.io/">Full Documentation</a> · <code>pip install scitex-introspect</code>
+  <a href="https://scitex-introspect.readthedocs.io/">Full Documentation</a> · <code>uv pip install scitex-introspect[all]</code>
 </p>
 
 <!-- scitex-badges:start -->
