@@ -60,8 +60,6 @@ ix.get_type_hints(func)      # PEP-563-resolved hints
 
 - `scitex-dev` — the higher-level `ecosystem` CLI uses scitex-introspect
   for its `list-python-apis` subcommand
-- `scitex-skills` — converts introspection output into agent-readable
-  skill leaves
 
 ## Sub-skills
 
