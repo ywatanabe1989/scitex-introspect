@@ -18,3 +18,15 @@ docs/sphinx/_build/
 docs/sphinx/api/
 *.swp
 .DS_Store
+
+# .scitex/ — track only dev/config.yaml; everything else under it is local state.
+.scitex/*
+!.scitex/dev/
+.scitex/dev/*
+!.scitex/dev/config.yaml
+
+# Agent-local target install dir (created by SciTeX quality playbook bootstrap).
+.venv-agent/
+
+# Subprocess-coverage shards (parallel mode).
+.coverage.*
