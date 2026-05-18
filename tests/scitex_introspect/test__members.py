@@ -4,118 +4,200 @@
 
 """Tests for scitex_introspect._members module."""
 
-import pytest
+from scitex_introspect import dir as introspect_dir
+from scitex_introspect import get_exports
 
 
 class TestDir:
     """Tests for dir function."""
 
-    def test_dir_success(self):
-        """Test listing members successfully."""
-        from scitex_introspect import dir
-
-        result = dir("json")
+    def test_dir_returns_success_true_for_module(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module)
+        # Assert
         assert result["success"] is True
+
+    def test_dir_includes_members_key_for_module(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module)
+        # Assert
         assert "members" in result
+
+    def test_dir_reports_nonzero_count_for_module(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module)
+        # Assert
         assert result["count"] > 0
 
-    def test_dir_public_filter(self):
-        """Test public filter excludes private members."""
-        from scitex_introspect import dir
-
-        result = dir("json", filter="public")
+    def test_dir_public_filter_reports_success(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="public")
+        # Assert
         assert result["success"] is True
-        for m in result["members"]:
-            assert not m["name"].startswith("_")
 
-    def test_dir_private_filter(self):
-        """Test private filter returns private members."""
-        from scitex_introspect import dir
+    def test_dir_public_filter_excludes_underscore_names(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="public")
+        # Assert
+        assert all(not m["name"].startswith("_") for m in result["members"])
 
-        result = dir("json", filter="private")
+    def test_dir_private_filter_reports_success(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="private")
+        # Assert
         assert result["success"] is True
-        # All should start with _ but not __
-        for m in result["members"]:
-            assert m["name"].startswith("_") and not m["name"].startswith("__")
 
-    def test_dir_dunder_filter(self):
-        """Test dunder filter returns dunder members."""
-        from scitex_introspect import dir
+    def test_dir_private_filter_returns_single_underscore_names(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="private")
+        # Assert
+        assert all(
+            m["name"].startswith("_") and not m["name"].startswith("__")
+            for m in result["members"]
+        )
 
-        result = dir("json", filter="dunder")
+    def test_dir_dunder_filter_reports_success(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="dunder")
+        # Assert
         assert result["success"] is True
-        for m in result["members"]:
-            assert m["name"].startswith("__")
 
-    def test_dir_kind_functions(self):
-        """Test filtering by function kind."""
-        from scitex_introspect import dir
+    def test_dir_dunder_filter_returns_double_underscore_names(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="dunder")
+        # Assert
+        assert all(m["name"].startswith("__") for m in result["members"])
 
-        result = dir("json", kind="functions")
+    def test_dir_kind_functions_reports_success(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, kind="functions")
+        # Assert
         assert result["success"] is True
-        for m in result["members"]:
-            assert m["kind"] == "function"
 
-    def test_dir_kind_classes(self):
-        """Test filtering by class kind."""
-        from scitex_introspect import dir
+    def test_dir_kind_functions_returns_only_function_entries(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, kind="functions")
+        # Assert
+        assert all(m["kind"] == "function" for m in result["members"])
 
-        result = dir("pathlib", kind="classes")
+    def test_dir_kind_classes_reports_success(self):
+        # Arrange
+        target_module = "pathlib"
+        # Act
+        result = introspect_dir(target_module, kind="classes")
+        # Assert
         assert result["success"] is True
-        for m in result["members"]:
-            assert m["kind"] == "class"
 
-    def test_dir_has_summary(self):
-        """Test members include summary from docstring."""
-        from scitex_introspect import dir
+    def test_dir_kind_classes_returns_only_class_entries(self):
+        # Arrange
+        target_module = "pathlib"
+        # Act
+        result = introspect_dir(target_module, kind="classes")
+        # Assert
+        assert all(m["kind"] == "class" for m in result["members"])
 
-        result = dir("json", filter="public")
+    def test_dir_public_members_carry_summary_field(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = introspect_dir(target_module, filter="public")
+        # Assert
+        assert len([m["summary"] for m in result["members"] if m["summary"]]) > 0
+
+    def test_dir_class_target_reports_success(self):
+        # Arrange
+        class_target = "pathlib.Path"
+        # Act
+        result = introspect_dir(class_target)
+        # Assert
         assert result["success"] is True
-        # At least some members should have summaries
-        summaries = [m["summary"] for m in result["members"] if m["summary"]]
-        assert len(summaries) > 0
 
-    def test_dir_class_target(self):
-        """Test listing members of a class."""
-        from scitex_introspect import dir
-
-        result = dir("pathlib.Path")
-        assert result["success"] is True
+    def test_dir_class_target_reports_nonzero_count(self):
+        # Arrange
+        class_target = "pathlib.Path"
+        # Act
+        result = introspect_dir(class_target)
+        # Assert
         assert result["count"] > 0
 
-    def test_dir_invalid_path(self):
-        """Test invalid path returns error."""
-        from scitex_introspect import dir
-
-        result = dir("nonexistent.module")
+    def test_dir_invalid_path_reports_success_false(self):
+        # Arrange
+        invalid_target = "nonexistent.module"
+        # Act
+        result = introspect_dir(invalid_target)
+        # Assert
         assert result["success"] is False
+
+    def test_dir_invalid_path_includes_error_key(self):
+        # Arrange
+        invalid_target = "nonexistent.module"
+        # Act
+        result = introspect_dir(invalid_target)
+        # Assert
         assert "error" in result
 
 
 class TestGetExports:
     """Tests for get_exports function."""
 
-    def test_get_exports_with_all(self):
-        """Test getting exports from module with __all__."""
-        from scitex_introspect import get_exports
-
-        result = get_exports("json")
+    def test_get_exports_with_all_reports_success(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = get_exports(target_module)
+        # Assert
         assert result["success"] is True
+
+    def test_get_exports_with_all_includes_exports_key(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = get_exports(target_module)
+        # Assert
         assert "exports" in result
+
+    def test_get_exports_with_all_includes_has_all_key(self):
+        # Arrange
+        target_module = "json"
+        # Act
+        result = get_exports(target_module)
+        # Assert
         assert "has_all" in result
 
-    def test_exports_without_all(self):
-        """Test getting exports from module without __all__."""
-        from scitex_introspect import get_exports
-
-        # Many stdlib modules don't have __all__
-        result = get_exports("scitex_introspect._resolve")
+    def test_get_exports_without_all_reports_success(self):
+        # Arrange
+        target_module = "scitex_introspect._resolve"
+        # Act
+        result = get_exports(target_module)
+        # Assert
         assert result["success"] is True
-        # Should still return public members
 
-    def test_exports_invalid_path(self):
-        """Test invalid path returns error."""
-        from scitex_introspect import get_exports
-
-        result = get_exports("nonexistent.module")
+    def test_get_exports_invalid_path_reports_success_false(self):
+        # Arrange
+        invalid_target = "nonexistent.module"
+        # Act
+        result = get_exports(invalid_target)
+        # Assert
         assert result["success"] is False
