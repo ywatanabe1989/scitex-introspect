@@ -4,79 +4,108 @@
 
 """Tests for scitex_introspect._type_hints module."""
 
-import pytest
+from scitex_introspect import get_class_annotations, get_type_hints_detailed
 
 
 class TestGetTypeHintsDetailed:
     """Tests for get_type_hints_detailed function."""
 
-    def test_get_type_hints_success(self):
-        """Test getting type hints successfully."""
-        from scitex_introspect import get_type_hints_detailed
-
-        result = get_type_hints_detailed("scitex_introspect._resolve.resolve_object")
+    def test_get_type_hints_reports_success_true(self):
+        # Arrange
+        target = "scitex_introspect._resolve.resolve_object"
+        # Act
+        result = get_type_hints_detailed(target)
+        # Assert
         assert result["success"] is True
+
+    def test_get_type_hints_returns_hints_or_count_key(self):
+        # Arrange
+        target = "scitex_introspect._resolve.resolve_object"
+        # Act
+        result = get_type_hints_detailed(target)
+        # Assert
         assert "hints" in result or "hint_count" in result
 
-    def test_type_hints_with_optional(self):
-        """Test detecting optional type hints."""
-        from scitex_introspect import get_type_hints_detailed
-
-        result = get_type_hints_detailed("scitex_introspect._signature.q")
-        assert result["success"] is True
-        # Check for optional detection in hints
-        if result.get("hints"):
-            for name, info in result["hints"].items():
-                assert "is_optional" in info
-
-    def test_type_hints_return_type(self):
-        """Test return type is included."""
-        from scitex_introspect import get_type_hints_detailed
-
-        result = get_type_hints_detailed("scitex_introspect._resolve.resolve_object")
-        assert result["success"] is True
-        # May or may not have return hint depending on function
-
-    def test_type_hints_class(self):
-        """Test type hints for class methods."""
-        from scitex_introspect import get_type_hints_detailed
-
-        result = get_type_hints_detailed("pathlib.Path")
+    def test_type_hints_optional_reports_success(self):
+        # Arrange
+        target = "scitex_introspect._signature.q"
+        # Act
+        result = get_type_hints_detailed(target)
+        # Assert
         assert result["success"] is True
 
-    def test_type_hints_no_hints(self):
-        """Test function without type hints."""
-        from scitex_introspect import get_type_hints_detailed
+    def test_type_hints_optional_each_hint_has_is_optional_flag(self):
+        # Arrange
+        target = "scitex_introspect._signature.q"
+        # Act
+        result = get_type_hints_detailed(target)
+        # Assert
+        assert all("is_optional" in info for info in result.get("hints", {}).values())
 
-        # Some functions may not have hints
-        result = get_type_hints_detailed("json.loads")
+    def test_type_hints_return_type_reports_success(self):
+        # Arrange
+        target = "scitex_introspect._resolve.resolve_object"
+        # Act
+        result = get_type_hints_detailed(target)
+        # Assert
         assert result["success"] is True
-        # Should return empty or minimal hints
 
-    def test_type_hints_invalid_path(self):
-        """Test invalid path returns error."""
-        from scitex_introspect import get_type_hints_detailed
+    def test_type_hints_class_target_reports_success(self):
+        # Arrange
+        class_target = "pathlib.Path"
+        # Act
+        result = get_type_hints_detailed(class_target)
+        # Assert
+        assert result["success"] is True
 
-        result = get_type_hints_detailed("nonexistent.module")
+    def test_type_hints_no_hints_reports_success(self):
+        # Arrange
+        target = "json.loads"
+        # Act
+        result = get_type_hints_detailed(target)
+        # Assert
+        assert result["success"] is True
+
+    def test_type_hints_invalid_path_reports_success_false(self):
+        # Arrange
+        invalid_target = "nonexistent.module"
+        # Act
+        result = get_type_hints_detailed(invalid_target)
+        # Assert
         assert result["success"] is False
 
 
 class TestGetClassAnnotations:
     """Tests for get_class_annotations function."""
 
-    def test_get_class_annotations_success(self):
-        """Test getting class annotations."""
-        from scitex_introspect import get_class_annotations
-
-        result = get_class_annotations("pathlib.PurePath")
+    def test_get_class_annotations_reports_success_true(self):
+        # Arrange
+        class_target = "pathlib.PurePath"
+        # Act
+        result = get_class_annotations(class_target)
+        # Assert
         assert result["success"] is True
-        # Result contains class_vars and methods, not annotations
+
+    def test_get_class_annotations_includes_class_vars_or_methods(self):
+        # Arrange
+        class_target = "pathlib.PurePath"
+        # Act
+        result = get_class_annotations(class_target)
+        # Assert
         assert "class_vars" in result or "methods" in result
 
-    def test_class_annotations_non_class(self):
-        """Test error when path is not a class."""
-        from scitex_introspect import get_class_annotations
-
-        result = get_class_annotations("json.dumps")
+    def test_class_annotations_non_class_reports_success_false(self):
+        # Arrange
+        non_class_target = "json.dumps"
+        # Act
+        result = get_class_annotations(non_class_target)
+        # Assert
         assert result["success"] is False
-        assert "not a class" in result["error"] or "error" in result
+
+    def test_class_annotations_non_class_carries_error_signal(self):
+        # Arrange
+        non_class_target = "json.dumps"
+        # Act
+        result = get_class_annotations(non_class_target)
+        # Assert
+        assert "not a class" in result.get("error", "") or "error" in result

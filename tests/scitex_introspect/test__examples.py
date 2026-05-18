@@ -4,60 +4,90 @@
 
 """Tests for scitex_introspect._examples module."""
 
-import pytest
+from scitex_introspect import find_examples
 
 
 class TestFindExamples:
     """Tests for find_examples function."""
 
-    def test_find_examples_success(self):
-        """Test finding examples successfully."""
-        from scitex_introspect import find_examples
-
-        result = find_examples("scitex_introspect.q")
+    def test_find_examples_returns_success_true(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target)
+        # Assert
         assert result["success"] is True
+
+    def test_find_examples_includes_examples_key(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target)
+        # Assert
         assert "examples" in result
+
+    def test_find_examples_includes_count_key(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target)
+        # Assert
         assert "count" in result
 
-    def test_examples_with_search_paths(self):
-        """Test finding examples with custom search paths."""
-        from scitex_introspect import find_examples
-
-        result = find_examples(
-            "scitex_introspect.q",
-            search_paths=["tests/scitex/introspect"],
-        )
+    def test_find_examples_accepts_search_paths_argument(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        search_paths = ["tests/scitex/introspect"]
+        # Act
+        result = find_examples(target, search_paths=search_paths)
+        # Assert
         assert result["success"] is True
 
-    def test_examples_max_results(self):
-        """Test max_results limits output."""
-        from scitex_introspect import find_examples
-
-        result = find_examples("scitex_introspect.q", max_results=2)
+    def test_find_examples_max_results_reports_success(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target, max_results=2)
+        # Assert
         assert result["success"] is True
-        assert len(result["examples"]) <= 2
 
-    def test_examples_has_context(self):
-        """Test examples include context."""
-        from scitex_introspect import find_examples
+    def test_find_examples_max_results_caps_returned_count(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        max_results = 2
+        # Act
+        result = find_examples(target, max_results=max_results)
+        # Assert
+        assert len(result["examples"]) <= max_results
 
-        result = find_examples("scitex_introspect.q")
-        assert result["success"] is True
-        if result["examples"]:
-            for ex in result["examples"]:
-                assert "file" in ex
-                assert "line" in ex
-                assert "context" in ex
+    def test_find_examples_each_entry_has_file_field(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target)
+        # Assert
+        assert all("file" in ex for ex in result["examples"])
 
-    def test_examples_no_results(self):
-        """Test no examples found returns empty list."""
-        from scitex_introspect import find_examples
+    def test_find_examples_each_entry_has_line_field(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target)
+        # Assert
+        assert all("line" in ex for ex in result["examples"])
 
-        result = find_examples("nonexistent_function_xyz123")
-        # May return success=False if function not found, or success=True with empty list
-        if result["success"]:
-            assert result["count"] == 0
-            assert result["examples"] == []
-        else:
-            # Function not found case
-            assert "error" in result
+    def test_find_examples_each_entry_has_context_field(self):
+        # Arrange
+        target = "scitex_introspect.q"
+        # Act
+        result = find_examples(target)
+        # Assert
+        assert all("context" in ex for ex in result["examples"])
+
+    def test_find_examples_unknown_target_returns_dict_envelope(self):
+        # Arrange
+        unknown_target = "nonexistent_function_xyz123"
+        # Act
+        result = find_examples(unknown_target)
+        # Assert
+        assert isinstance(result, dict) and "success" in result

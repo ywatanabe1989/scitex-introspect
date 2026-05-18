@@ -4,96 +4,136 @@
 
 """Tests for scitex_introspect._resolve module."""
 
-import pytest
+import json
+from collections.abc import Mapping
+from pathlib import Path
+
+from scitex_introspect import get_type_info, resolve_object
 
 
 class TestResolveObject:
     """Tests for resolve_object function."""
 
-    def test_resolve_module(self):
-        """Test resolving a module."""
-        from scitex_introspect import resolve_object
-
-        obj, error = resolve_object("json")
+    def test_resolve_module_returns_no_error(self):
+        # Arrange
+        path = "json"
+        # Act
+        _, error = resolve_object(path)
+        # Assert
         assert error is None
-        assert obj is not None
-        import json
 
+    def test_resolve_module_returns_module_object(self):
+        # Arrange
+        path = "json"
+        # Act
+        obj, _ = resolve_object(path)
+        # Assert
         assert obj is json
 
-    def test_resolve_function(self):
-        """Test resolving a function."""
-        from scitex_introspect import resolve_object
-
-        obj, error = resolve_object("json.dumps")
+    def test_resolve_function_returns_no_error(self):
+        # Arrange
+        path = "json.dumps"
+        # Act
+        _, error = resolve_object(path)
+        # Assert
         assert error is None
-        import json
 
+    def test_resolve_function_returns_function_object(self):
+        # Arrange
+        path = "json.dumps"
+        # Act
+        obj, _ = resolve_object(path)
+        # Assert
         assert obj is json.dumps
 
-    def test_resolve_class(self):
-        """Test resolving a class."""
-        from scitex_introspect import resolve_object
-
-        obj, error = resolve_object("pathlib.Path")
+    def test_resolve_class_returns_no_error(self):
+        # Arrange
+        path = "pathlib.Path"
+        # Act
+        _, error = resolve_object(path)
+        # Assert
         assert error is None
-        from pathlib import Path
 
+    def test_resolve_class_returns_class_object(self):
+        # Arrange
+        path = "pathlib.Path"
+        # Act
+        obj, _ = resolve_object(path)
+        # Assert
         assert obj is Path
 
-    def test_resolve_nested(self):
-        """Test resolving nested attribute."""
-        from scitex_introspect import resolve_object
-
-        obj, error = resolve_object("collections.abc.Mapping")
+    def test_resolve_nested_path_returns_no_error(self):
+        # Arrange
+        path = "collections.abc.Mapping"
+        # Act
+        _, error = resolve_object(path)
+        # Assert
         assert error is None
-        from collections.abc import Mapping
 
+    def test_resolve_nested_path_returns_target_object(self):
+        # Arrange
+        path = "collections.abc.Mapping"
+        # Act
+        obj, _ = resolve_object(path)
+        # Assert
         assert obj is Mapping
 
-    def test_resolve_invalid_returns_error(self):
-        """Test resolving invalid path returns error."""
-        from scitex_introspect import resolve_object
-
-        obj, error = resolve_object("nonexistent.module.thing")
+    def test_resolve_invalid_path_returns_none_object(self):
+        # Arrange
+        path = "nonexistent.module.thing"
+        # Act
+        obj, _ = resolve_object(path)
+        # Assert
         assert obj is None
+
+    def test_resolve_invalid_path_returns_non_none_error(self):
+        # Arrange
+        path = "nonexistent.module.thing"
+        # Act
+        _, error = resolve_object(path)
+        # Assert
         assert error is not None
+
+    def test_resolve_invalid_path_error_mentions_could_not_resolve(self):
+        # Arrange
+        path = "nonexistent.module.thing"
+        # Act
+        _, error = resolve_object(path)
+        # Assert
         assert "Could not resolve" in error
 
 
 class TestGetTypeInfo:
     """Tests for get_type_info function."""
 
-    def test_type_info_module(self):
-        """Test type info for module."""
-        import json
-
-        from scitex_introspect import get_type_info
-
-        info = get_type_info(json)
+    def test_type_info_module_reports_module_kind(self):
+        # Arrange
+        target = json
+        # Act
+        info = get_type_info(target)
+        # Assert
         assert info["kind"] == "module"
 
-    def test_type_info_function(self):
-        """Test type info for function."""
-        import json
-
-        from scitex_introspect import get_type_info
-
-        info = get_type_info(json.dumps)
+    def test_type_info_function_reports_function_kind(self):
+        # Arrange
+        target = json.dumps
+        # Act
+        info = get_type_info(target)
+        # Assert
         assert info["kind"] == "function"
 
-    def test_type_info_class(self):
-        """Test type info for class."""
-        from pathlib import Path
-
-        from scitex_introspect import get_type_info
-
-        info = get_type_info(Path)
+    def test_type_info_class_reports_class_kind(self):
+        # Arrange
+        target = Path
+        # Act
+        info = get_type_info(target)
+        # Assert
         assert info["kind"] == "class"
 
-    def test_type_info_data(self):
-        """Test type info for data."""
-        from scitex_introspect import get_type_info
-
-        info = get_type_info([1, 2, 3])
+    def test_type_info_list_value_reports_data_kind(self):
+        # Arrange
+        target = [1, 2, 3]
+        # Act
+        info = get_type_info(target)
+        # Assert
         assert info["kind"] == "data"

@@ -4,88 +4,135 @@
 
 """Tests for scitex_introspect._class_hierarchy module."""
 
-import pytest
+from scitex_introspect import get_class_hierarchy, get_mro
 
 
 class TestGetClassHierarchy:
     """Tests for get_class_hierarchy function."""
 
-    def test_get_hierarchy_success(self):
-        """Test getting class hierarchy successfully."""
-        from scitex_introspect import get_class_hierarchy
-
-        result = get_class_hierarchy("collections.abc.Mapping")
+    def test_get_hierarchy_returns_success_true(self):
+        # Arrange
+        target = "collections.abc.Mapping"
+        # Act
+        result = get_class_hierarchy(target)
+        # Assert
         assert result["success"] is True
+
+    def test_get_hierarchy_includes_mro_key(self):
+        # Arrange
+        target = "collections.abc.Mapping"
+        # Act
+        result = get_class_hierarchy(target)
+        # Assert
         assert "mro" in result
+
+    def test_get_hierarchy_includes_subclasses_key(self):
+        # Arrange
+        target = "collections.abc.Mapping"
+        # Act
+        result = get_class_hierarchy(target)
+        # Assert
         assert "subclasses" in result
+
+    def test_get_hierarchy_reports_nonzero_mro_count(self):
+        # Arrange
+        target = "collections.abc.Mapping"
+        # Act
+        result = get_class_hierarchy(target)
+        # Assert
         assert result["mro_count"] > 0
 
-    def test_hierarchy_mro_order(self):
-        """Test MRO is in correct order."""
-        from scitex_introspect import get_class_hierarchy
+    def test_hierarchy_mro_includes_self_class_name(self):
+        # Arrange
+        target = "collections.abc.MutableMapping"
+        # Act
+        result = get_class_hierarchy(target)
+        # Assert
+        assert "MutableMapping" in [c["name"] for c in result["mro"]]
 
-        result = get_class_hierarchy("collections.abc.MutableMapping")
-        assert result["success"] is True
-        # MutableMapping should have Mapping in its MRO
-        mro_names = [c["name"] for c in result["mro"]]
-        assert "MutableMapping" in mro_names
-        assert "Mapping" in mro_names
+    def test_hierarchy_mro_includes_parent_class_name(self):
+        # Arrange
+        target = "collections.abc.MutableMapping"
+        # Act
+        result = get_class_hierarchy(target)
+        # Assert
+        assert "Mapping" in [c["name"] for c in result["mro"]]
 
-    def test_hierarchy_without_builtins(self):
-        """Test hierarchy excludes builtins by default."""
-        from scitex_introspect import get_class_hierarchy
+    def test_hierarchy_excludes_object_when_builtins_false(self):
+        # Arrange
+        target = "pathlib.Path"
+        # Act
+        result = get_class_hierarchy(target, include_builtins=False)
+        # Assert
+        assert "object" not in [c["name"] for c in result["mro"]]
 
-        result = get_class_hierarchy("pathlib.Path", include_builtins=False)
-        assert result["success"] is True
-        mro_names = [c["name"] for c in result["mro"]]
-        assert "object" not in mro_names
+    def test_hierarchy_includes_object_when_builtins_true(self):
+        # Arrange
+        target = "pathlib.Path"
+        # Act
+        result = get_class_hierarchy(target, include_builtins=True)
+        # Assert
+        assert "object" in [c["name"] for c in result["mro"]]
 
-    def test_hierarchy_with_builtins(self):
-        """Test hierarchy includes builtins when requested."""
-        from scitex_introspect import get_class_hierarchy
-
-        result = get_class_hierarchy("pathlib.Path", include_builtins=True)
-        assert result["success"] is True
-        mro_names = [c["name"] for c in result["mro"]]
-        assert "object" in mro_names
-
-    def test_hierarchy_non_class_error(self):
-        """Test error when path is not a class."""
-        from scitex_introspect import get_class_hierarchy
-
-        result = get_class_hierarchy("json.dumps")
+    def test_hierarchy_non_class_reports_success_false(self):
+        # Arrange
+        non_class_target = "json.dumps"
+        # Act
+        result = get_class_hierarchy(non_class_target)
+        # Assert
         assert result["success"] is False
+
+    def test_hierarchy_non_class_error_mentions_not_a_class(self):
+        # Arrange
+        non_class_target = "json.dumps"
+        # Act
+        result = get_class_hierarchy(non_class_target)
+        # Assert
         assert "not a class" in result["error"]
 
-    def test_hierarchy_max_depth(self):
-        """Test max_depth limits subclass traversal."""
-        from scitex_introspect import get_class_hierarchy
-
-        result = get_class_hierarchy("collections.abc.Mapping", max_depth=1)
-        assert result["success"] is True
-        # With max_depth=1, nested subclasses should not have children
-        for sub in result.get("subclasses", []):
-            assert "subclasses" not in sub or len(sub["subclasses"]) == 0
+    def test_hierarchy_max_depth_one_truncates_subclass_tree(self):
+        # Arrange
+        target = "collections.abc.Mapping"
+        # Act
+        result = get_class_hierarchy(target, max_depth=1)
+        # Assert
+        assert all(
+            "subclasses" not in sub or len(sub["subclasses"]) == 0
+            for sub in result.get("subclasses", [])
+        )
 
 
 class TestGetMro:
     """Tests for get_mro function."""
 
-    def test_get_mro_success(self):
-        """Test getting MRO successfully."""
-        from scitex_introspect import get_mro
-
-        result = get_mro("collections.OrderedDict")
+    def test_get_mro_returns_success_true(self):
+        # Arrange
+        target = "collections.OrderedDict"
+        # Act
+        result = get_mro(target)
+        # Assert
         assert result["success"] is True
+
+    def test_get_mro_includes_mro_key(self):
+        # Arrange
+        target = "collections.OrderedDict"
+        # Act
+        result = get_mro(target)
+        # Assert
         assert "mro" in result
+
+    def test_get_mro_returns_nonempty_mro_list(self):
+        # Arrange
+        target = "collections.OrderedDict"
+        # Act
+        result = get_mro(target)
+        # Assert
         assert len(result["mro"]) > 0
 
-    def test_mro_qualnames(self):
-        """Test MRO returns qualified names."""
-        from scitex_introspect import get_mro
-
-        result = get_mro("pathlib.Path")
-        assert result["success"] is True
-        # Each entry should be a qualified name
-        for name in result["mro"]:
-            assert "." in name
+    def test_get_mro_returns_qualified_names_with_dots(self):
+        # Arrange
+        target = "pathlib.Path"
+        # Act
+        result = get_mro(target)
+        # Assert
+        assert all("." in name for name in result["mro"])
