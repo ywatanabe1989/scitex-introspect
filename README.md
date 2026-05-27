@@ -72,17 +72,21 @@ ix.dir(my_pkg)       # List attributes/methods
 ix.list_api(my_pkg)  # Recursive module API tree
 
 # Detailed inspection
-ix.signature(my_func)
-ix.docstring(my_func)
-ix.source(my_func)
-ix.members(my_pkg)
+ix.get_docstring(my_func)        # Parsed docstring sections
+ix.get_exports(my_pkg)           # Module __all__ contents
+ix.get_type_info(my_func)        # Type annotation details
+ix.get_type_hints_detailed(func) # PEP-563-resolved type hints
+ix.get_class_annotations(Cls)    # Class variable/method annotations
+ix.get_mro(Cls)                  # Method Resolution Order
 
 # Static analysis
-ix.imports(file_path)
-ix.call_graph(my_func)
-ix.class_hierarchy(MyClass)
-ix.examples(my_func)
-ix.resolve("scitex.io.save")
+ix.get_imports(file_path)        # Static import analysis via AST
+ix.get_dependencies(my_mod)      # Module dependency tree
+ix.get_call_graph(my_func)       # Function call graph
+ix.get_function_calls(my_func)   # Simple outgoing calls list
+ix.get_class_hierarchy(MyClass)  # MRO + subclass walk
+ix.find_examples(my_func)        # Usage from tests/examples
+ix.resolve_object("scitex.io.save")  # Dotted-path → object
 ```
 
 </details>
@@ -106,7 +110,7 @@ flowchart LR
     A["scitex_introspect.q(obj)"] --> B[".signature + type hints"]
     A2["scitex_introspect.qq(obj)"] --> C[".source"]
     A3["scitex_introspect.dir(pkg)"] --> D[".members + .list_api"]
-    A4["scitex_introspect.resolve('a.b.c')"] --> E["dotted-path lookup"]
+    A4["scitex_introspect.resolve_object('a.b.c')"] --> E["dotted-path lookup"]
     B & C & D & E --> F["agent / REPL output"]
 ```
 
