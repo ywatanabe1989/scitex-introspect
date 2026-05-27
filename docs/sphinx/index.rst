@@ -1,5 +1,5 @@
 scitex-introspect
-=============
+=================
 
 IPython-style introspection for any Python package — signatures, docstrings,
 source, call graphs, class hierarchy, imports, and module API trees.
