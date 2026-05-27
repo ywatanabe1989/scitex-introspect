@@ -9,6 +9,17 @@ tags: [scitex-introspect-quick-start]
 # Quick Start
 
 ```python
-import scitex_introspect
-# TODO: smallest useful example
+import scitex_introspect as ix
+
+# Like func? in IPython — signature + type hints + docstring summary
+ix.q("json.loads")
+
+# Like func?? in IPython — full source code
+ix.qq("json.loads")
+
+# Smart-filtered dir() with metadata
+ix.dir("json")
+
+# Recursive module API tree
+ix.list_api("json", max_depth=2)
 ```

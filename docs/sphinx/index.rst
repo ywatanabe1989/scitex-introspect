@@ -1,8 +1,8 @@
 scitex-introspect
-=============
+=================
 
-Small linear-algebra helpers (distance, geometric median, cosine, nannorm)
-extracted from the SciTeX ecosystem as a standalone package.
+IPython-style introspection for any Python package — signatures, docstrings,
+source, call graphs, class hierarchy, imports, and module API trees.
 
 .. toctree::
    :maxdepth: 2
