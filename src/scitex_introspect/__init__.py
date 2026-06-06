@@ -63,6 +63,8 @@ from ._core import (  # IPython-style names; Basic; Advanced - Call graph; Advan
     resolve_object,
 )
 from ._list_api import list_api
+from ._list_packages import list_packages, main
+from ._src import src
 
 __all__ = [
     "__version__",
@@ -89,4 +91,8 @@ __all__ = [
     # Advanced - Call graph
     "get_call_graph",
     "get_function_calls",
+    # Package-level helpers (ported from scitex_gen - B3)
+    "list_packages",
+    "main",
+    "src",
 ]
