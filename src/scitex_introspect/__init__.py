@@ -62,9 +62,12 @@ from ._core import (  # IPython-style names; Basic; Advanced - Call graph; Advan
     qq,
     resolve_object,
 )
+from ._is_defined import is_defined_global, is_defined_local
+from ._is_later_or_equal import is_later_or_equal
 from ._list_api import list_api
 from ._list_packages import list_packages, main
 from ._src import src
+from ._this_file import THIS_FILE, this_file
 
 __all__ = [
     "__version__",
@@ -95,4 +98,10 @@ __all__ = [
     "list_packages",
     "main",
     "src",
+    # Variable / version / file inspection (ported from scitex_gen misc.py)
+    "is_defined_global",
+    "is_defined_local",
+    "is_later_or_equal",
+    "this_file",
+    "THIS_FILE",
 ]
