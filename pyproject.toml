@@ -40,6 +40,8 @@ docs = [
 ]
 all = [
     "scitex-introspect[mcp]",
+    "scitex-introspect[dev]",
+    "scitex-introspect[docs]",
 ]
 
 [project.urls]
